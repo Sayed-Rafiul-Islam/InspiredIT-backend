@@ -17,11 +17,13 @@ app.use(express.urlencoded({extended : true}))
 // Route Imports
 const productRouter = require('./routes/productRouter')
 const adminRouter = require('./routes/adminRouter')
+const inventoryRouter = require('./routes/inventoryRouter')
 
 
 // Routes 
 app.use('/api', productRouter) 
 app.use('/api', adminRouter) 
+app.use('/api', inventoryRouter) 
 
 const mongoose = require('mongoose');
 

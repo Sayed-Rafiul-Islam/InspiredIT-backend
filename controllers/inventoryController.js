@@ -1,18 +1,11 @@
-const db = require('../models')
-
-// Create Main Model
-
-const Inventory = db.inventories
-
-// main work 
-
+const Inventory = require('../models/inventoryModel')
 
 // get all inventory items
 
 const getInventory = async (req,res) => {  
     try {
         const page = req.query.page
-        const inventory = await Inventory.findAll()
+        const inventory = await Inventory.find({})
         res.status(200).send(inventory.reverse().slice(10*page,10*(page+1)))
     } catch (error) {
         res.status(500).send(error)
@@ -23,7 +16,7 @@ const getInventory = async (req,res) => {
 
 const getInventoryPageCount = async (req,res) => {
     try {
-        const inventory = await Inventory.findAll()
+        const inventory = await Inventory.find({})
         const pageCount = Math.ceil(inventory.length / 10)
         res.status(200).json(pageCount)
     } catch (error) {
@@ -35,9 +28,7 @@ const getInventoryPageCount = async (req,res) => {
 const getOneItem = async (req,res) => {
     try {
         const id = req.query.id
-        const item = await Inventory.findOne({
-            where : {id : id}
-        })
+        const item = await Inventory.findOne({_id : id})
         res.status(200).send(item)
     } catch (error) {
         res.status(500).send(error)
@@ -49,10 +40,8 @@ const getOneItem = async (req,res) => {
 const deleteItem = async (req,res) => {
     try {
         const id = req.query.id
-        await Inventory.destroy({
-        where : {id : id}
-    })
-    res.status(200).json()
+        await Inventory.deleteOne({_id : id})
+        res.status(200).json()
     } catch (error) {
         res.status(500).send(error)
     }
