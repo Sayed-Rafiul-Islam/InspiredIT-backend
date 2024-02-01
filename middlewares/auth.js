@@ -2,6 +2,7 @@ const { verifyJwt } = require("../utils/varifyJWT");
 
 const userAuthViaToken = async (req, res, next) => {
 
+
     const accessToken = req.query.accessToken;
     if (!accessToken) {
         return res.status(401).send({message : "Forbidden Access"});
