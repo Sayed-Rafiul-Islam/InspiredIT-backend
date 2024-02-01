@@ -38,7 +38,7 @@ const uri = process.env.MONGO_URI;
 const clientOptions = { 
     serverApi: { 
         version: '1', 
-        strict: true, 
+        strict: false, 
         deprecationErrors: true 
     } 
 }

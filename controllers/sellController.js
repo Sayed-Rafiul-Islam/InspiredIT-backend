@@ -9,19 +9,25 @@ const getSellRecords = async (req,res) => {
     try {
         const {page,search} = req.query
         if (search === '') {
-            const sell_records = await Sells.findAll()
+            const sell_records = await Sell.find()
             res.status(200).send(sell_records.reverse().slice(10*page,10*(page+1)))
         } else {
-            const sell_records = await Sells.findAll({
-                where : {
-                    [Op.or] : [
-                        {product_id : {[Op.like] : `%${search}%`}},
-                        {customer_name : {[Op.like] : `%${search}%`}},
-                        {contact_no : {[Op.like] : `%${search}%`}}
-                    ]
+
+            const sell_records = await Sell.aggregate([
+                {
+                  $search: {
+                    index: "search_text",
+                    text: {
+                      query: search,
+                      path: {
+                        wildcard: "*"
+                      }
+                    }
+                  }
                 }
-            })
+              ])
             res.status(200).send(sell_records.reverse().slice(10*page,10*(page+1)))
+
         }
     } catch (error) {
         res.status(500).send(error)
@@ -33,11 +39,7 @@ const getSellRecords = async (req,res) => {
 const getSellRecord = async (req,res) => {  
     try {
         const {id} = req.query
-        const sell_record = await Sells.findOne({
-            where : {
-                product_id : id
-            }
-        })
+        const sell_record = await Sell.findOne({product_id : id})
         res.status(200).send(sell_record)
     
     } catch (error) {
@@ -49,8 +51,8 @@ const getSellRecord = async (req,res) => {
 
 const getSellPageCount = async (req,res) => {
     try {
-        const {count} = await Sells.findAndCountAll()
-        const pageCount = Math.ceil(count / 10)
+        const count = await Sell.find()
+        const pageCount = Math.ceil(count.length / 10)
         res.status(200).json(pageCount)
     } catch (error) {
         res.status(500).send(error)
@@ -65,8 +67,8 @@ const getSellPageCountByDate = async (req,res) => {
     try {
         const {from,to} = req.query
         if (from === '' || to === '') {
-            const {count} = await Sells.findAndCountAll()
-            const pageCount = Math.ceil(count / 10)
+            const count = await Sell.find()
+            const pageCount = Math.ceil(count.length / 10)
             res.status(200).json(pageCount)
         } else {
             const year = to.split("-")[0]
@@ -74,12 +76,14 @@ const getSellPageCountByDate = async (req,res) => {
             const day = to.split("-")[2]
             const dayPlusOne = (parseInt(day) + 1).toString()
             const newTo = year + '-' + month + '-' + dayPlusOne
-            const {count} = await Sells.findAndCountAll({
-                where : {
-                    selling_date : { [Op.and] : [{ [Op.gt] : from }, { [Op.lte] : newTo }] }
+            const filter = {
+                selling_date: {
+                  $gte: from,
+                  $lte: newTo,
                 }
-            })
-            const pageCount = Math.ceil(count / 10)
+              };
+            const count = await Sell.find().where(filter)
+            const pageCount = Math.ceil(count.length / 10)
             res.status(200).json(pageCount)
         }
 
@@ -95,7 +99,7 @@ const getSellByDate = async (req,res) => {
         const {from,to,page} = req.query
 
         if (from === '' || to === '') {
-            const sells = await Sells.findAll()
+            const sells = await Sell.find()
             res.status(200).json(sells.reverse().slice(10*page,10*(page+1)))
         } else {
             const year = to.split("-")[0]
@@ -103,12 +107,14 @@ const getSellByDate = async (req,res) => {
             const day = to.split("-")[2]
             const dayPlusOne = (parseInt(day) + 1).toString()
             const newTo = year + '-' + month + '-' + dayPlusOne
-            const sells = await Sells.findAll({
-                where : {
-                    selling_date : { [Op.and] : [{ [Op.gt] : from }, { [Op.lte] : newTo }] }
+            const filter = {
+                selling_date: {
+                  $gte: from,
+                  $lte: newTo,
                 }
-            })
-            res.status(200).json(sells.reverse().slice(10*page,10*(page+1)))
+              };
+            const sells = await Sell.find(filter)
+            res.status(200).json(sells.reverse().slice(page*10,(page+1)*10))
         }
     } catch (error) {
         res.status(500).send(error)
@@ -122,7 +128,8 @@ const getSellByDate = async (req,res) => {
 
 const addSell = async (req,res) => {
     try {
-        const {product_id,
+        const {
+            product_id,
             product_name,
             configuration,
             unit_price,
@@ -132,8 +139,9 @@ const addSell = async (req,res) => {
             selling_price,
             due,
             source_name,
-            import_date} = req.body;
-        const date = new Date().toISOString().split("T")[0]
+            import_date
+        } = req.body;
+        const date = new Date()
         const newSellRecord = {
             product_id,
             product_name,
@@ -147,20 +155,16 @@ const addSell = async (req,res) => {
             selling_date : date
         }
 
-        await Sells.create(newSellRecord)
-        await Products.destroy({
-            where : {product_id : product_id}
-        })
+        await Sell.create(newSellRecord)
+        await Product.deleteOne({product_id})
         const item = await Inventory.findOne({
-            where : {
                 product_name,
                 configuration,
                 source_name,
                 unit_price,
                 import_date
-            }
-        })
-        await item.decrement('quantity', {by : 1})
+            })
+        await Inventory.updateOne({_id : item._id}, { $inc: { quantity: -1 } })
         res.status(200).send({message : `sold id ${product_id} and deleted from products and inventory quantity updated`})
 
         } catch (error) {
@@ -174,9 +178,7 @@ const addSell = async (req,res) => {
 const deleteSell = async (req,res) => {
     try {
         const {id} = req.query
-        await Sells.destroy({
-        where : {product_id : id}
-    })
+        await Sell.deleteOne({product_id : id})
     res.status(200).json({message : "sell record deleted"})
     } catch (error) {
         res.status(500).send(error)
