@@ -1,9 +1,6 @@
 const Product = require('../models/productModel')
 const Inventory = require('../models/inventoryModel')
 
-// main work 
-
-
 // get all inventory items
 
 const getProductIds = async (req,res) => {  

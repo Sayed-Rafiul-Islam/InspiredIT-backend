@@ -1,13 +1,7 @@
-const db = require('../models')
+const Admin = require('../models/adminModel')
 const { createJwt } = require('../utils/varifyJWT')
 const { encode } = require('../utils/cypher')
 const bcrypt = require('bcrypt');
-
-// Create Main Model
-
-const Admins = db.admins
-
-// main work 
 
 // login
 
@@ -18,9 +12,7 @@ const login = async (req,res) => {
         const data = {email : email, date : currentDate}
 
 
-        const isAdmin = await Admins.findOne({
-                where : { email : email}
-            })
+        const isAdmin = await Admin.findOne({ email : email})
         if (!isAdmin) {
             res.status(404).send({message : "No account with this email"})
         } else {
@@ -53,14 +45,12 @@ const createAdmin = async (req,res) => {
         const token = await createJwt(data)
         const pass_word = await encode(password)
 
-        const isAdmin = await Admins.findOne({
-            where : { email : email}
-        })
+        const isAdmin = await Admin.findOne({ email : email})
 
         if (isAdmin) {
             res.status(400).send({message : "Account already exists with this email"})
         } else {
-            await Admins.create({
+            await Admin.create({
                 admin_name : name,
                 email,
                 pass_word
