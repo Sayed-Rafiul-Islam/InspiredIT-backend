@@ -1,26 +1,13 @@
-const { Op } = require('sequelize')
-const db = require('../models')
+const Monthly = require('../models/monthlyModel')
 
-// Create Main Model
-
-const Monthlies = db.monthly_records
-
-// main work 
 
 // get monthly records by date
 
 const getMonthlyRecords = async (req,res) => {
     try {
         const {record_date} = req.query
-      
-            const records = await Monthlies.findAll({
-                where : {
-                    record_date : record_date
-                }
-            })
-            
-            res.status(200).json(records.reverse())
-        
+        const records = await Monthly.find({record_date})
+        res.status(200).json(records.reverse())
     } catch (error) {
         res.status(500).send(error)
     }
@@ -31,7 +18,8 @@ const getMonthlyRecords = async (req,res) => {
 
 const addMonthly = async (req,res) => {
     try {
-        const {sold,
+        const {
+            sold,
             bought,
             due,
             employee,
@@ -50,7 +38,7 @@ const addMonthly = async (req,res) => {
             record_date
         }
 
-        await Monthlies.create(newRecord)
+        await Monthly.create(newRecord)
         res.status(200).send({message : `Record Added`})
 
         } catch (error) {
@@ -64,10 +52,8 @@ const addMonthly = async (req,res) => {
 const deleteMonthly = async (req,res) => {
     try {
         const {id} = req.query
-        await Monthlies.destroy({
-        where : {monthly_record_id : id}
-    })
-    res.status(200).json({message : "monthly record deleted"})
+        await Monthly.deleteOne({_id : id})
+        res.status(200).json({message : "monthly record deleted"})
     } catch (error) {
         res.status(500).send(error)
     }

@@ -18,12 +18,18 @@ app.use(express.urlencoded({extended : true}))
 const productRouter = require('./routes/productRouter')
 const adminRouter = require('./routes/adminRouter')
 const inventoryRouter = require('./routes/inventoryRouter')
+const monthlyRouter = require('./routes/monthlyRouter')
+const sellRouter = require('./routes/sellRouter')
+const varificationRouter = require('./routes/varification')
 
 
 // Routes 
 app.use('/api', productRouter) 
 app.use('/api', adminRouter) 
 app.use('/api', inventoryRouter) 
+app.use('/api', monthlyRouter) 
+app.use('/api', sellRouter) 
+app.use('/api', varificationRouter) 
 
 const mongoose = require('mongoose');
 

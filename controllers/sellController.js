@@ -1,13 +1,6 @@
-const { Op } = require('sequelize')
-const db = require('../models')
-
-// Create Main Model
-
-const Products = db.products
-const Inventory = db.inventories
-const Sells = db.sell_records
-
-// main work 
+const Sell = require('../models/sellModel')
+const Product = require('../models/productModel')
+const Inventory = require('../models/inventoryModel')
 
 
 // get all sell records and search filter
