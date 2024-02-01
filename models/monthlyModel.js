@@ -1,47 +1,38 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require(".");
+const mongoose = require("mongoose")
 
-module.exports = (sequelize,DataTypes) => {
+const Schema = mongoose.Schema
 
-    const MonthlyRecord = sequelize.define('monthly_record',{
-        monthly_record_id : {
-            type : DataTypes.INTEGER,
-            allowNull : false,
-            unique: true,
-            primaryKey : true,
-            autoIncrement: true
-        },
-        bought : {
-            type : DataTypes.INTEGER,
-            allowNull : false
-        },
-        sold : {
-            type : DataTypes.INTEGER,
-            allowNull : false
-        },
-        employee : {
-            type : DataTypes.INTEGER,
-            allowNull : false
-        },
-        additionals : {
-            type : DataTypes.INTEGER,
-            allowNull : false
-        },
-        due : {
-            type : DataTypes.INTEGER,
-            allowNull : false
-        },
-        profit : {
-            type : DataTypes.INTEGER,
-            allowNull : false
-        },
-        record_date : {
-            type : DataTypes.STRING,
-            allowNull : false
-        },
-    },        
-        {timestamps : false},
-    )
+const monthlyRecordSchema = new Schema({
+    bought : {
+        type : Number,
+        required : true
+    },
+    sold : {
+        type : Number,
+        required : true
+    },
+    employee : {
+        type : Number,
+        required : true
+    },
+    additionals : {
+        type : Number,
+        required : true
+    },
+    due : {
+        type : Number,
+        required : true
+    },
+    profit : {
+        type : Number,
+        required : true
+    },
+    record_date : {
+        type : String,
+        required : true
+    }
+})
 
-    return MonthlyRecord
-}
+const MonthlyRecord = mongoose.model("MonthlyRecord", monthlyRecordSchema)
+
+module.exports = MonthlyRecord

@@ -1,16 +1,17 @@
-const { 
-    getProductIds, 
+const { getProductIds, 
     getProductPageCount, 
-    addProduct, 
-    getOneProduct, 
-    deleteProduct } = require('../controllers/productController')
+    addProduct,
+    getOneProduct,
+    deleteProduct
+} = require('../controllers/productController')
+const express = require('express');
 
-const router = require('express').Router()
+const router = express.Router()
 
 router.get('/productIds', getProductIds)
-router.get('/productsPageCount', getProductPageCount)
-router.get('/products', getOneProduct)
+router.get('/productIdPageCount', getProductPageCount)
 router.post('/addProduct', addProduct)
+router.get('/products', getOneProduct)
 router.delete('/product', deleteProduct)
 
 module.exports = router

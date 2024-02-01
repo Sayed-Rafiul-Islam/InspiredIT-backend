@@ -1,38 +1,34 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require(".");
+const mongoose = require("mongoose")
 
-module.exports = (sequelize,DataTypes) => {
+const Schema = mongoose.Schema
 
-    const Product = sequelize.define('product',{
-        product_id : {
-            type : DataTypes.STRING,
-            allowNull : false,
-            unique: true,
-            primaryKey : true
-        },
-        product_name : {
-            type : DataTypes.STRING,
-            allowNull : false
-        },
-        configuration : {
-            type : DataTypes.STRING,
-            allowNull : false
-        },
-        source_name : {
-            type : DataTypes.STRING,
-            allowNull : false
-        },
-        unit_price : {
-            type : DataTypes.STRING,
-            allowNull : false
-        },
-        import_date : {
-            type : DataTypes.STRING,
-            allowNull : false
-        },
-    },        
-        {timestamps : false},
-    )
+const productSchema = new Schema({
+    product_id : {
+        type : String,
+        required : true
+    },
+    product_name : {
+        type : String,
+        required : true
+    },
+    configuration : {
+        type : String,
+        required : true
+    },
+    source_name : {
+        type : String,
+        required : true
+    },
+    unit_price : {
+        type : String,
+        required : true
+    },
+    import_date : {
+        type : String,
+        required : true
+    }
+})
 
-    return Product
-}
+const Product = mongoose.model("Product", productSchema)
+
+module.exports = Product

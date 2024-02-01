@@ -1,60 +1,51 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require(".");
+const mongoose = require("mongoose")
 
-module.exports = (sequelize,DataTypes) => {
+const Schema = mongoose.Schema
 
-    const SellRecord = sequelize.define('sell_record',{
-        selling_id : {
-            type : DataTypes.INTEGER,
-            allowNull : false,
-            unique: true,
-            primaryKey : true,
-            autoIncrement: true
-        },
-        customer_name : {
-            type : DataTypes.STRING,
-            allowNull : false
-        },
-        contact_no : {
-            type : DataTypes.STRING,
-            allowNull : false
-        },
-        address : {
-            type : DataTypes.STRING,
-            allowNull : false
-        },
-        product_id : {
-            type : DataTypes.STRING,
-            allowNull : false,
-            unique: true
-        },
-        product_name : {
-            type : DataTypes.STRING,
-            allowNull : false
-        },
-        configuration : {
-            type : DataTypes.STRING,
-            allowNull : false
-        },
-        buying_price : {
-            type : DataTypes.INTEGER,
-            allowNull : false
-        },
-        selling_price : {
-            type : DataTypes.INTEGER,
-            allowNull : false
-        },
-        due : {
-            type : DataTypes.INTEGER,
-            allowNull : false
-        },
-        selling_date : {
-            type : DataTypes.DATE,
-            allowNull : false
-        },
-    },        
-        {timestamps : false},
-    )
+const SellRecordSchema = new Schema({
+    customer_name : {
+        type : String,
+        required : true
+    },
+    contact_no : {
+        type : String,
+        required : true
+    },
+    address : {
+        type : String,
+        required : true
+    },
+    product_id : {
+        type : String,
+        required : true,
+        unique: true
+    },
+    product_name : {
+        type : String,
+        required : true
+    },
+    configuration : {
+        type : String,
+        required : true
+    },
+    buying_price : {
+        type : Number,
+        required : true
+    },
+    selling_price : {
+        type : Number,
+        required : true
+    },
+    due : {
+        type : Number,
+        required : true
+    },
+    selling_date : {
+        type : Date,
+        required : true
+    }
+})
 
-    return SellRecord
-}
+const SellRecord = mongoose.model("SellRecord", SellRecordSchema)
+
+module.exports = SellRecord

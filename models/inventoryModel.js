@@ -1,55 +1,36 @@
-// const { db } = require("../db/db-config")
+const mongoose = require("mongoose")
 
-// module.exports = {
-//     query10Items : (req) => {
-//         const page = req.query.page
-//         const query = `SELECT *
-//         FROM inventory ORDER BY import_date DESC LIMIT ?, 10`;
-//         const result = db
-//         .promise().
-//         query(query,[page*10])  
-//         .then(([result]) => result )
-//         .catch((err) => console.log(err))
-//         return result
-//     }   
-// } 
+const Schema = mongoose.Schema
 
-const { DataTypes } = require("sequelize");
-const { sequelize } = require(".");
-
-module.exports = (sequelize,DataTypes) => {
-
-    const Inventory = sequelize.define('inventory', {
-        product_name : {
-            type : DataTypes.STRING,
-            allowNull : false,
-            
-        },
-        configuration : {
-            type : DataTypes.STRING,
-            allowNull : false,
-            
-        },
-        source_name : {
-            type : DataTypes.STRING,
-            allowNull : false,
-            
-        },
-        unit_price : {
-            type : DataTypes.INTEGER,
-            allowNull : false
-        },
-        quantity : {
-            type : DataTypes.INTEGER,
-            allowNull : false
-        },
-        import_date : {
-            type : DataTypes.STRING,
-            allowNull : false
-        }
+const inventorySchema = new Schema({
+    product_name : {
+        type : String,
+        required : true
     },
-    {timestamps : false},
-    )
+    configuration : {
+        type : String,
+        required : true
+        
+    },
+    source_name : {
+        type : String,
+        required : true
+        
+    },
+    unit_price : {
+        type : Number,
+        required : true
+    },
+    quantity : {
+        type : Number,
+        required : true    
+    },
+    import_date : {
+        type : String,
+        required : true    
+    }
+})
 
-    return Inventory
-}
+const Inventory = mongoose.model("Inventory", inventorySchema)
+
+module.exports = Inventory
